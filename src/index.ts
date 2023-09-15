@@ -42,10 +42,7 @@ app.get('/recipes', async (req, res) => {
 })
 
 app.post("/recipes", async (req, res) => {
-    // const nom_recette = req.body.recette
-    // const note = req.body.note
-    // const duree = req.body.duree
-    // const lien_image = req.body.url
+    
     const nouvelleRecette = await Recipe.create({
         recette: req.body.nom_recette,
         note: req.body.note,
