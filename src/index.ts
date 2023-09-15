@@ -2,27 +2,32 @@ import express from "express";
 import 'dotenv/config';
 import cors from "cors";
 import bodyParser from "body-parser";
-
-import { DataTypes, Sequelize } from "sequelize"
+import { DataTypes, Sequelize } from "sequelize";
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db.sqlite",
 })
 
-const Todo = sequelize.define("todos", {
-  name: {
+const Recipe = sequelize.define("recipes", {
+  recette: {
     type: DataTypes.STRING,
   },
-  status: {
-    type: DataTypes.BOOLEAN,
+  note: {
+    type: DataTypes.NUMBER,
+  },
+  duree: {
+    type: DataTypes.NUMBER,
+  },
+  url: {
+    type: DataTypes.STRING,
   },
 })
 
 // Conserver mes données
-// sequelize.sync()
+sequelize.sync()
 // Reset des données
-sequelize.sync({ force: true })
+// sequelize.sync({ force: true })
 
 const app = express();
 app.use(cors());
@@ -30,23 +35,26 @@ app.use(bodyParser.json());
 
 const port = process.env.PORT ? parseInt(process.env.PORT as string) : 3030
 
-app.get('/random-between/:min/:max', async (req, res) => {
-    const min = parseInt(req.params.min)
-    const max = parseInt(req.params.max)
-    const random = Math.floor(Math.random() * (max - min + 1)) + min
-    console.log('number : ' + random);
-    const maTodo = await Todo.create({name: "ma todo 1", status: true})
-    console.log(maTodo);
-    
-    res.send(random.toString());
+app.get('/recipes', async (req, res) => {
+    const allRecipes = await Recipe.findAll();
+    console.log(allRecipes);
+    res.json(allRecipes);
 })
 
-app.post("/send-name", (req, res) => {
-    const name = req.body.name
-    console.log(name)
-    res.json({ leNomFourni: name })
+app.post("/recipes", async (req, res) => {
+    // const nom_recette = req.body.recette
+    // const note = req.body.note
+    // const duree = req.body.duree
+    // const lien_image = req.body.url
+    const nouvelleRecette = await Recipe.create({
+        recette: req.body.nom_recette,
+        note: req.body.note,
+        duree: req.body.duree,
+        url: req.body.lien_image
+    })
+    console.log(nouvelleRecette)
+    res.json(nouvelleRecette)
 })
-  
 
 app.listen(port, () => {
     console.log('serveur running on port : ' + port);
